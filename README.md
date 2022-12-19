@@ -1,5 +1,5 @@
 # rgb2gba
-A program to convert an rgb image to a gba formatted array of frames.
+A program to convert a directory of rgb images to a gba formatted array of frames.
 This is mostly to be used in conjunction with the other repo
 
 To compile, use the `make` command from the rgb2gba directory
