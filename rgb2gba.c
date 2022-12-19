@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <stdio.h>
 using namespace std;
 
 #include <CImg.h>
@@ -13,20 +14,20 @@ int rgbToHicolor(int r, int g, int b)
    return (((r >> 3) & 31) | (((g >> 3) & 31) << 5) | (((b >> 3) & 31) << 10));
 }
 
-int processImage(string dir, string imageName)
+int processImage(string dir, string imageName, FILE* fptr)
 {
     CImg<unsigned char> src;
     src.load((dir+"/"+imageName).c_str());
     int width = src.width();
     int height = src.height();
 
-    string arrayStr = "const unsigned bitmap" + imageName + "[19200]={"; 
+    //string arrayStr = "const unsigned bitmap" + imageName + "[19200]={"; 
     for (int r = 0; r < height; r++) {
         for (int c = 0; c < width-1; c+=2) {
             unsigned pixel1 = rgbToHicolor( (int)src(c,r,0,0), (int)src(c,r,0,1), (int)src(c,r,0,2) );
             unsigned pixel2 = rgbToHicolor( (int)src(c+1,r,0,0), (int)src(c+1,r,0,1), (int)src(c+1,r,0,2) );
-            printf("0x");
-            printf("%X%X,",pixel1,pixel2);
+            //printf("0x");
+            fprintf(fptr,"0x%X%X,",pixel1,pixel2);
 	    }
     }
     
@@ -36,6 +37,12 @@ int processImage(string dir, string imageName)
 int main(int argc, char** argv)
 {
     vector<string> frameVector;
+
+    FILE *fptr = fopen("frames.h", "w");
+    if (fptr == NULL) {
+        printf("Could not open file");
+        return 0;
+    }
 
     DIR *dir;
     struct dirent *ent;
@@ -52,14 +59,16 @@ int main(int argc, char** argv)
     perror ("");
     return EXIT_FAILURE;
     }
-    printf("int numFrames = %d;\n", (frameVector.size()-2));
-    printf("const unsigned frames[%d][19200]={\n",(frameVector.size()-2));
+    fprintf(fptr, "int numFrames = %d;\n", (frameVector.size()-2));
+    fprintf(fptr, "const unsigned frames[%d][19200]={\n",(frameVector.size()-2));
     for (int i = 2; i < frameVector.size(); i++)
     {
-        processImage(argv[1],frameVector[i]);
-        printf("\n");
+        processImage(argv[1],frameVector[i],fptr);
+        fprintf(fptr,"\n");
     }
-    printf("};");
+
+    fprintf(fptr,"};");
+    fclose(fptr);
 
     return 0;
 }
