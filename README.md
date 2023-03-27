@@ -1,5 +1,5 @@
 # rgb2gba
-A program to convert a directory of rgb images to a gba formatted array of frames.
+A program to convert a directory of rgb images to an array of frames which is compatible with gba to be directly loaded in VRAM.
 This is mostly to be used in conjunction with the other repo to convert regular bitmaps to 15 bit formatted
 
 To compile, use the `make` command from the rgb2gba directory
